@@ -1,20 +1,30 @@
 {
-  "name": "aimer-db",
-  "version": "1.0.0",
-  "description": "AI M&A Intelligence Platform",
-  "main": "index.js",
+  "name": "aimer-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
+  },
   "dependencies": {
-    "@anthropic-ai/claude-code": "^1.0.86",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^5.1.0",
-    "pg": "^8.11.0"
+    "@types/pg": "^8.15.5",
+    "dotenv": "^17.2.1",
+    "next": "15.5.0",
+    "pg": "^8.16.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "@types/pg": "^8.10.0"
-  },
-  "scripts": {
-    "start": "node server.js",
-    "migrate": "node migrations/migrate.js"
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

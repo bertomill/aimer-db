@@ -23,16 +23,19 @@ export default function Home() {
       ]);
 
       const [statsData, dealsData, companiesData] = await Promise.all([
-        statsRes.json(),
-        dealsRes.json(),
-        companiesRes.json()
+        statsRes.ok ? statsRes.json() : null,
+        dealsRes.ok ? dealsRes.json() : [],
+        companiesRes.ok ? companiesRes.json() : []
       ]);
 
       setStats(statsData);
-      setDeals(dealsData);
-      setCompanies(companiesData);
+      setDeals(Array.isArray(dealsData) ? dealsData : []);
+      setCompanies(Array.isArray(companiesData) ? companiesData : []);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setDeals([]);
+      setCompanies([]);
+      setStats(null);
     } finally {
       setLoading(false);
     }

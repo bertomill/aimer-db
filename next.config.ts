@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: process.cwd()
-  }
+  // Turbopack is disabled for production builds
 };
 
 export default nextConfig;

@@ -1,0 +1,18 @@
+{
+  "name": "aimer-db",
+  "version": "1.0.0",
+  "description": "AI M&A Intelligence Platform",
+  "main": "index.js",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.86",
+    "pg": "^8.11.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.10.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "migrate": "node migrations/migrate.js"
+  }
+}

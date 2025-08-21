@@ -1,11 +1,15 @@
 {
-  "buildCommand": "cd aimer-frontend && npm run build",
-  "outputDirectory": "aimer-frontend/.next",
-  "installCommand": "cd aimer-frontend && npm install",
-  "framework": "nextjs",
-  "functions": {
-    "aimer-frontend/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
+  "version": 2,
+  "builds": [
+    {
+      "src": "aimer-frontend/next.config.ts",
+      "use": "@vercel/next"
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "aimer-frontend/$1"
+    }
+  ]
 }

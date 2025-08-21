@@ -1,9 +1,21 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 
+interface StatsResponse {
+  totalDeals: number;
+  totalDealValue: number;
+  totalCompanies: number;
+  mostActiveBuyer: { name: string; deal_count: string } | null;
+}
+
 export async function GET() {
   try {
-    const stats: any = {};
+    const stats: StatsResponse = {
+      totalDeals: 0,
+      totalDealValue: 0,
+      totalCompanies: 0,
+      mostActiveBuyer: null
+    };
     
     // Total deals
     const dealsCount = await pool.query('SELECT COUNT(*) FROM deals');

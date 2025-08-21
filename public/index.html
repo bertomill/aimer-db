@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI M&A Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .deal-value {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI M&A Intelligence Platform</h1>
+        
+        <div class="stats-grid" id="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Deals</div>
+                <div class="stat-value" id="totalDeals">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Deal Value</div>
+                <div class="stat-value" id="totalValue">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Companies Tracked</div>
+                <div class="stat-value" id="totalCompanies">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Most Active Buyer</div>
+                <div class="stat-value" id="activeBuyer">-</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('deals')">Deals</button>
+            <button class="tab" onclick="showTab('companies')">Companies</button>
+        </div>
+        
+        <div class="content-card">
+            <div id="dealsContent">
+                <h2 style="margin-bottom: 20px;">Recent M&A Deals</h2>
+                <div id="dealsTable">
+                    <div class="loading">Loading deals...</div>
+                </div>
+            </div>
+            
+            <div id="companiesContent" style="display: none;">
+                <h2 style="margin-bottom: 20px;">AI Companies</h2>
+                <div id="companiesTable">
+                    <div class="loading">Loading companies...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTab = 'deals';
+        
+        // Format currency
+        function formatCurrency(value) {
+            if (!value) return 'Undisclosed';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalDeals').textContent = stats.totalDeals;
+                document.getElementById('totalValue').textContent = formatCurrency(stats.totalDealValue);
+                document.getElementById('totalCompanies').textContent = stats.totalCompanies;
+                document.getElementById('activeBuyer').textContent = 
+                    stats.mostActiveBuyer ? stats.mostActiveBuyer.name : 'N/A';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Load deals
+        async function loadDeals() {
+            try {
+                const response = await fetch('/api/deals');
+                const deals = await response.json();
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Buyer</th>
+                                <th>Target</th>
+                                <th>Deal Value</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>AI Focus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                deals.forEach(deal => {
+                    html += `
+                        <tr>
+                            <td>${formatDate(deal.announced_date)}</td>
+                            <td><strong>${deal.buyer_name}</strong></td>
+                            <td>${deal.target_name}</td>
+                            <td class="deal-value">${formatCurrency(deal.deal_value)}</td>
+                            <td>${deal.deal_type || 'N/A'}</td>
+                            <td>
+                                <span class="status-badge status-${deal.deal_status}">
+                                    ${deal.deal_status}
+                                </span>
+                            </td>
+                            <td>${deal.ai_focus_area || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('dealsTable').innerHTML = html;
+            } catch (error) {
+                document.getElementById('dealsTable').innerHTML = 
+                    '<div class="error">Error loading deals: ' + error.message + '</div>';
+            }
+        }
+        
+        // Load companies
+        async function loadCompanies() {
+            try {
+                const response = await fetch('/api/companies');
+                const companies = await response.json();
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Industry</th>
+                                <th>Founded</th>
+                                <th>Headquarters</th>
+                                <th>Employees</th>
+                                <th>Funding Stage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                companies.forEach(company => {
+                    html += `
+                        <tr>
+                            <td><strong>${company.name}</strong></td>
+                            <td>${company.industry || 'N/A'}</td>
+                            <td>${company.founding_year || 'N/A'}</td>
+                            <td>${company.headquarters || 'N/A'}</td>
+                            <td>${company.employee_count || 'N/A'}</td>
+                            <td>${company.funding_stage || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('companiesTable').innerHTML = html;
+            } catch (error) {
+                document.getElementById('companiesTable').innerHTML = 
+                    '<div class="error">Error loading companies: ' + error.message + '</div>';
+            }
+        }
+        
+        // Tab switching
+        function showTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide content
+            if (tab === 'deals') {
+                document.getElementById('dealsContent').style.display = 'block';
+                document.getElementById('companiesContent').style.display = 'none';
+                loadDeals();
+            } else {
+                document.getElementById('dealsContent').style.display = 'none';
+                document.getElementById('companiesContent').style.display = 'block';
+                loadCompanies();
+            }
+        }
+        
+        // Initialize
+        loadStats();
+        loadDeals();
+    </script>
+</body>
+</html>

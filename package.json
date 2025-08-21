@@ -5,8 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "@anthropic-ai/claude-code": "^1.0.86",
-    "pg": "^8.11.0",
-    "dotenv": "^16.4.5"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "pg": "^8.11.0"
   },
   "devDependencies": {
     "@types/pg": "^8.10.0"
